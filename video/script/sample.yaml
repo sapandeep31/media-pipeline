@@ -1,0 +1,57 @@
+# Sample: proves the whole chain (TTS -> align -> capture -> Remotion -> master). ~18 s.
+# Time references (any `at`/`until`/`start`/`end` key and all `beats:` values) accept:
+#   seconds | "word:<token>[#n][+/-s]" | "wordend:<token>" | "end-<s>" | "narr_end[+/-s]"   (scene-relative)
+# The capture scene needs a web app at BASE_URL (default http://localhost:3000); drop it to test without one.
+meta:
+  title: Acme sample
+  fps: 30
+  width: 1920
+  height: 1080
+  voice: af_heart          # Kokoro voice or blend, e.g. "af_heart:0.6,bf_emma:0.4"; gallery: public/gen/voices
+  speed: 1.0
+  lang: en-us
+  vocab: "Acme, Gemini, Remotion."   # short whisper hint: product and people names only
+  pad: [0.35, 0.6]         # silence before / after narration in each scene
+  captions: true           # kinetic word captions (per-scene `captions: false` to hide)
+  music: { src: assets/music/synth/night_pulse.wav, volume: 0.32, duck: 0.3, fadeIn: 0.8, fadeOut: 2.0 }
+
+scenes:
+  - id: title
+    narration: "Meet {Ak-mee|Acme}, the fastest way to ship a launch video."
+    visual: { type: title, title: "Acme", subtitle: "Script it. Render it. Ship it.", kicker: "Launch 2026" }
+    captions: false
+    min_duration: 4.2
+    overlap: 0.5             # next scene's entry transition overlaps the last 0.5 s of this one
+    sfx:
+      - { at: 0.0, name: whoosh_rev, volume: 0.5 }
+      - { at: 0.55, name: boom, volume: 0.55 }
+      - { at: 1.1, name: shimmer, volume: 0.35 }
+
+  - id: demo
+    narration: "Write the scenes once. Every narration word can time a click, a zoom or a callout."
+    visual:
+      type: capture
+      recipe: click-cta      # tools/capture/recipes.mjs
+      frame: window          # window | full
+      zooms:
+        - { at: "word:zoom-0.4", dur: 3.0, x: 960, y: 540, scale: 1.6 }
+      callouts:
+        - { at: "word:callout", until: "narr_end", x: 860, y: 480, w: 200, h: 120, label: "Timed to the word", side: top }
+    beats:
+      click: "word:click-0.6"
+    transition: { in: wipe, dur: 0.5 }
+    overlays:
+      - { type: lowerThird, at: 0.8, until: "word:zoom", title: "Narration-timed capture", subtitle: "beats come from word timings" }
+    sfx:
+      - { at: 0.05, name: whoosh, volume: 0.45 }
+      - { at: "word:click", name: click, volume: 0.7 }
+
+  - id: outro
+    narration: "Acme. Ship the story with the product."
+    visual: { type: outro, name: "Acme", tagline: "Ship the story with the product.", url: "acme.example" }
+    transition: { in: zoom, dur: 0.6 }
+    captions: false
+    min_duration: 4.5
+    sfx:
+      - { at: 0.0, name: whoosh, volume: 0.4 }
+      - { at: 0.6, name: shimmer, volume: 0.35 }

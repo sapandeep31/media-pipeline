@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deck title</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAF7; --ink:#15161A; --muted:#6B6E76; --line:#E4E3DD; --panel:#F1F0EA;
+  --accent:#2F5BEA; --font:'Inter',system-ui,sans-serif; --mono:'JetBrains Mono',ui-monospace,monospace;
+}
+.dark{ --bg:#111214; --ink:#F2F1EC; --muted:#9A9CA3; --line:#2A2B30; --panel:#1A1B1F; }
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#0c0c0e;font-family:var(--font);-webkit-font-smoothing:antialiased}
+.stage{position:fixed;inset:0;overflow:hidden}
+.deck{width:1280px;height:720px;position:absolute;left:50%;top:50%;margin:-360px 0 0 -640px;transform-origin:center}
+section{position:absolute;inset:0;background:var(--bg);color:var(--ink);padding:64px 64px 56px;display:flex;flex-direction:column;
+  opacity:0;pointer-events:none;transition:opacity .35s ease}
+section.on{opacity:1;pointer-events:auto}
+.eyebrow{font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:18px}
+h1{font-size:72px;line-height:1.02;letter-spacing:-.035em;font-weight:700;max-width:18ch}
+h2{font-size:48px;line-height:1.08;letter-spacing:-.025em;font-weight:600;max-width:22ch}
+p,li{font-size:24px;line-height:1.45;color:var(--ink);max-width:40ch}
+.lede{color:var(--muted);margin-top:24px}
+h1+p,h2+p{margin-top:32px}
+ul{padding:0;list-style:none;margin-top:36px;display:grid;gap:18px}
+li{padding-left:28px;position:relative}
+li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:2px;background:var(--accent)}
+.fill{flex:1;display:flex;flex-direction:column;justify-content:center}
+.center{align-items:center;text-align:center} .center h1,.center h2,.center p{margin-inline:auto}
+.big{white-space:nowrap;font-size:180px;font-weight:700;letter-spacing:-.05em;line-height:.9;color:var(--accent);font-feature-settings:"tnum"}
+.source{margin-top:auto;font-size:14px;color:var(--muted);padding-top:16px;max-width:none}
+.row{display:grid;grid-template-columns:repeat(12,1fr);gap:24px;margin-top:40px;flex:1;align-items:center}
+.row>*{min-width:0}
+.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c4{grid-column:span 4}.c8{grid-column:span 8}
+.frame{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px;box-shadow:0 24px 48px -28px rgba(0,0,0,.25)}
+.mono{font-family:var(--mono);font-size:17px;line-height:1.6}
+.quote{font-size:36px;line-height:1.3;letter-spacing:-.015em;max-width:30ch}
+.who{margin-top:20px;font-size:18px;color:var(--muted)}
+.accent{color:var(--accent)}
+.stat{border-top:2px solid var(--ink);padding-top:14px}
+.stat b{display:block;font-size:56px;letter-spacing:-.03em;font-weight:600;font-feature-settings:"tnum"}
+.stat span{font-size:18px;color:var(--muted)}
+.bar{height:14px;border-radius:3px;background:var(--line)} .bar.hi{background:var(--accent)}
+/* Brand frame on every slide, as funded decks do: mark + name left, page right. Filled in by the script. */
+/* The deck's mark is a source to clone, never shown itself (the hidden attribute does not apply to SVG). */
+#brandmark{display:none}
+.foot{position:absolute;left:64px;right:64px;bottom:20px;display:flex;align-items:center;gap:10px;font-size:13px;color:var(--muted)}
+.foot .bm{width:20px;height:20px;display:flex}.foot .bm svg{width:100%;height:100%}.foot .pg{margin-left:auto;font-feature-settings:"tnum"}
+.foot::before{content:"";position:absolute;left:0;right:0;top:-10px;height:2px;background:linear-gradient(90deg,var(--accent) 0 64px,var(--line) 64px)}
+section{padding-bottom:64px}
+/* Full-bleed brand slide: cover, section break, close. */
+section.brand{background:var(--brand,var(--accent));color:#fff;--ink:#fff;--muted:rgba(255,255,255,.78);--line:rgba(255,255,255,.3);--panel:rgba(255,255,255,.12)}
+section.brand .foot::before{background:rgba(255,255,255,.35)}
+section.brand .logo{width:96px;height:96px;margin-bottom:36px;border-radius:24px;box-shadow:0 0 0 3px rgba(255,255,255,.9)}section.brand .logo svg{width:100%;height:100%;display:block}
+section.brand::after{content:"";position:absolute;right:-160px;top:-160px;width:560px;height:560px;border-radius:50%;border:80px solid rgba(255,255,255,.08);pointer-events:none}
+/* Line icons from the sprite below: <svg class="ico"><use href="#i-chat"/></svg> */
+.ico{width:30px;height:30px;stroke:var(--accent);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.flow .ico{display:block;margin-bottom:18px;width:44px;height:44px}
+.tl .ico{display:block;margin-bottom:10px;width:36px;height:36px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:22px;margin-top:40px}
+.cards>div{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:30px 28px;min-height:230px}
+.cards>div.hi{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.cards .ico{width:48px;height:48px;margin-bottom:22px}
+.cards b{display:block;font-size:26px;letter-spacing:-.01em;margin-bottom:10px}.cards span{display:block;font-size:19px;line-height:1.4;color:var(--muted)}
+/* The picture sits in the middle of the space under the headline, not stuck to it with a void below. */
+section>.tl,section>.flow,section>.cards,section>.quad,section>.hbars,section>table.t,section>.row,section>.split,section>.cols,section>.kpis,section>.stack,section>.layers,section>.phones,section>.iso,section>.gantt{margin-top:auto!important;margin-bottom:auto}
+/* The key phrase of a headline in the brand colour, as GoTo and Grab do: <h2>Loans <em>tripled</em> in a year</h2> */
+h1 em,h2 em{font-style:normal;color:var(--accent)}
+section.brand h1 em,section.brand h2 em,section.photo h1 em,section.photo h2 em{color:inherit;text-decoration:underline;text-decoration-thickness:5px;text-underline-offset:10px}
+/* Half-bleed picture running to the slide edge (Grab and GoTo covers, Airbnb's product slide).
+   Markup: section.media, then as its last child figure.pic holding the img and a figcaption.credit (author, licence). */
+section.media{padding-right:calc(44% + 56px)}
+section.media>.pic{position:absolute;top:0;right:0;bottom:0;width:44%;margin:0;overflow:hidden;background:var(--panel)}
+.pic img{width:100%;height:100%;object-fit:cover;display:block}
+.pic.screen{background:#0d0f13;display:flex;align-items:center;padding:40px 28px}.pic.screen img{height:auto;object-fit:contain;border-radius:10px;box-shadow:0 30px 60px -20px rgba(0,0,0,.6)}
+.credit{position:absolute;right:10px;bottom:8px;font-size:11px;line-height:1.3;color:#fff;background:rgba(0,0,0,.55);padding:3px 8px;border-radius:4px;max-width:92%}
+section.media .foot{right:calc(44% + 32px)}
+section.media h1{font-size:58px}section.media h2{font-size:44px}
+section.media::after{display:none}
+/* Full-bleed photograph with the headline over a dark fade. */
+section.photo{color:#fff;--ink:#fff;--muted:rgba(255,255,255,.85);--line:rgba(255,255,255,.35);--panel:rgba(0,0,0,.35);justify-content:flex-end;background:#111}
+section.photo>.bg{position:absolute;inset:0;margin:0}
+section.photo>.bg img{width:100%;height:100%;object-fit:cover;display:block}
+section.photo>.bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.1) 20%,rgba(0,0,0,.8))}
+section.photo>:not(.bg):not(.foot){position:relative;z-index:1}
+section.photo .credit{top:10px;bottom:auto;z-index:2}
+section.photo .foot::before{background:rgba(255,255,255,.35)}
+.foot{z-index:2}
+/* Column chart: periods or options side by side, value above, label below, one column in the accent.
+   <div class="cols" style="--max:100"><div style="--v:78"><b>78%</b><i></i><span>2023</span></div>...</div> */
+.cols{display:flex;align-items:flex-end;gap:36px;height:330px;margin-bottom:44px;border-bottom:2px solid var(--ink);padding:0 24px}
+.cols>div{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;position:relative;min-width:0}
+.cols i{display:block;width:100%;max-width:150px;height:0;background:color-mix(in srgb,var(--muted) 35%,var(--bg));border-radius:6px 6px 0 0;transition:height .9s cubic-bezier(.2,.7,.2,1) calc(var(--d,0)*150ms + .2s)}
+.cols .hi i{background:var(--accent)}
+.cols b{font-size:28px;font-weight:700;margin-bottom:10px;font-feature-settings:"tnum";white-space:nowrap}
+.cols .hi b{color:var(--accent)}
+.cols span{position:absolute;top:100%;margin-top:12px;font-size:19px;color:var(--muted);white-space:nowrap}
+section.on .cols i,.print .cols i{height:calc(var(--v) / var(--max,100) * (100% - 52px))}
+/* Donut for one share of a whole ("77% still write it by hand"). <div class="donut" style="--p:77"><div><b>77%</b><span>label</span></div></div> */
+@property --pp{syntax:'<number>';inherits:false;initial-value:0}
+.donut{--pp:0;position:relative;width:320px;height:320px;border-radius:50%;flex:none;display:grid;place-items:center;text-align:center;
+  background:conic-gradient(var(--accent) calc(var(--pp)*1%),color-mix(in srgb,var(--muted) 22%,var(--bg)) 0);transition:--pp 1.3s cubic-bezier(.2,.7,.2,1) .2s}
+.donut::before{content:"";position:absolute;inset:46px;border-radius:50%;background:var(--bg)}
+.donut>*{position:relative}
+.donut b{display:block;font-size:68px;font-weight:700;letter-spacing:-.035em;color:var(--accent);line-height:1;font-feature-settings:"tnum"}
+.donut span{display:block;font-size:18px;color:var(--muted);max-width:160px;margin:8px auto 0;line-height:1.3}
+section.on .donut,.print .donut{--pp:var(--p)}
+.donut.lo{background:conic-gradient(color-mix(in srgb,var(--muted) 70%,var(--bg)) calc(var(--pp)*1%),color-mix(in srgb,var(--muted) 22%,var(--bg)) 0)}.donut.lo b{color:var(--ink)}
+/* Isotype: one icon per unit, the counted ones in the accent ("three in four"). <div class="iso" data-of="4" data-hi="3" data-icon="store"></div> */
+.iso{display:flex;flex-wrap:wrap;gap:20px;align-content:center}
+.iso svg{width:var(--s,110px);height:var(--s,110px);stroke:color-mix(in srgb,var(--muted) 40%,var(--bg));fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;opacity:0;transform:translateY(12px);transition:opacity .45s,transform .45s}
+.iso svg.hi{stroke:var(--accent);stroke-width:1.7}
+section.on .iso svg,.print .iso svg{opacity:1;transform:none}
+/* Key numbers in a row, as in GoTo's "Key Results". <div class="kpis"><div class="hi"><b>39,3 jt</b><span>label</span></div>...</div> */
+.kpis{display:grid;grid-auto-flow:column;grid-auto-columns:1fr;gap:36px}
+.kpis>div{border-top:3px solid var(--line);padding-top:20px}
+.kpis>div.hi{border-color:var(--accent)}
+.kpis b{display:block;font-size:72px;font-weight:700;letter-spacing:-.04em;line-height:1;font-feature-settings:"tnum";white-space:nowrap}
+.kpis .hi b{color:var(--accent)}
+.kpis span{display:block;font-size:20px;line-height:1.35;color:var(--muted);margin-top:12px}
+/* Stacked bar: how one whole splits (6% interest = 5% to lenders + 1% to the platform). Width = --w. */
+.stack{display:flex;gap:6px;height:150px}
+.stack>div{flex:var(--w) 1 0;min-width:0;border-radius:10px;background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;justify-content:center;padding:0 26px;
+  clip-path:inset(0 100% 0 0);transition:clip-path .8s cubic-bezier(.2,.7,.2,1) calc(var(--d,0)*250ms + .2s)}
+.stack>div.hi{background:var(--accent);border-color:var(--accent);color:#fff}
+.stack b{font-size:52px;font-weight:700;letter-spacing:-.03em;line-height:1;font-feature-settings:"tnum"}
+.stack span{font-size:19px;margin-top:8px;opacity:.85}
+section.on .stack>div,.print .stack>div{clip-path:inset(0)}
+.scale{display:flex;justify-content:space-between;font-size:18px;color:var(--muted);margin-top:12px}
+/* Layers: who takes a loss first, top to bottom; the last layer is the one being protected. */
+.layers{display:grid;gap:10px}
+.layers>div{display:grid;grid-template-columns:52px 1fr auto;align-items:center;gap:22px;padding:18px 28px;border-radius:12px;background:var(--accent);color:#fff}
+.layers>div:nth-child(2){background:color-mix(in srgb,var(--accent) 82%,#000)}.layers>div:nth-child(3){background:color-mix(in srgb,var(--accent) 64%,#000)}
+.layers>div.base{background:var(--panel);color:var(--ink);border:2px dashed var(--muted)}
+.layers .ico{stroke:currentColor;width:44px;height:44px}
+.layers b{font-size:26px}.layers span{font-size:19px;opacity:.85}.layers em{font-style:normal;font-size:19px;opacity:.9;text-align:right}
+/* Several phone screens in a row, one per step of the product. */
+.phones{display:flex;gap:44px;justify-content:center;align-items:flex-start}
+.phones figure{margin:0;display:flex;flex-direction:column;align-items:center;gap:12px}
+.phones .phone{width:210px;height:300px}
+.phones figcaption{font-size:22px;font-weight:600;text-align:center}.phones figcaption span{display:block;font-weight:400;color:var(--muted);font-size:18px;margin-top:2px}
+/* Roadmap or ask as a gantt over real months or weeks, as in investor decks: one row per deliverable, the bar
+   from --a to --b on a 0..--max axis, the end label beside the bar (inside it with class "end").
+   --ticks is the number of gridline intervals; the last row is the axis: <div class="ax"><b></b><p><span>0</span>…<span>18</span></p></div>
+   <div class="gantt" style="--max:18;--ticks:3"><div style="--a:0;--b:3"><b>SMS service<small>open source</small></b><i><em>Month 3</em></i></div>…</div> */
+.gantt{display:grid;gap:16px;padding-top:24px}
+.gantt>div{display:grid;grid-template-columns:320px 1fr;align-items:center;gap:28px}
+.gantt>div>b{font-size:22px;font-weight:600;line-height:1.25}.gantt>div>b small{display:block;font-size:18px;font-weight:400;color:var(--muted);margin-top:2px}
+.gantt>div>i{position:relative;height:52px;border-left:2px solid var(--ink);background:repeating-linear-gradient(90deg,transparent 0 calc(100% / var(--ticks,3) - 1px),var(--line) 0 calc(100% / var(--ticks,3)))}
+.gantt>div>i::before{content:"";position:absolute;top:8px;bottom:8px;left:calc(var(--a) / var(--max) * 100%);width:calc((var(--b) - var(--a)) / var(--max) * 100%);background:color-mix(in srgb,var(--muted) 38%,var(--bg));border-radius:0 8px 8px 0}
+.gantt>div.hi>i::before{background:var(--accent)}
+.gantt em{position:absolute;top:50%;transform:translateY(-50%);left:calc(var(--b) / var(--max) * 100% + 14px);font-style:normal;font-size:19px;font-weight:600;white-space:nowrap}
+.gantt .hi em{color:var(--accent)}
+.gantt .end em{left:auto;right:calc((var(--max) - var(--b)) / var(--max) * 100% + 14px);color:#fff}
+.gantt>.ax p{margin:-6px -12px 0 -6px;max-width:none;display:flex;justify-content:space-between;font-size:18px;color:var(--muted);font-feature-settings:"tnum"}
+aside.notes{display:none}
+#progress{position:fixed;left:0;bottom:0;height:3px;background:var(--accent);transition:width .3s}
+#notes{position:fixed;left:0;right:0;bottom:0;max-height:32vh;overflow:auto;background:#16171b;color:#ddd;font:16px/1.5 var(--font);padding:18px 24px;display:none}
+#notes.show{display:block}
+/* Hint sits in the dark margin, never on the slide, and fades after a few seconds. */
+#hint{position:fixed;right:16px;bottom:10px;font:12px var(--font);color:#777;transition:opacity .6s;pointer-events:none}
+#hint.gone{opacity:0}
+/* ---- charts and visuals: data lives in the markup, CSS draws it, entrance plays when the slide shows ---- */
+.hbars{display:grid;grid-template-columns:auto 1fr auto;gap:22px 20px;align-items:center;margin-top:8px}
+.hbars .l{font-size:22px;color:var(--ink);white-space:nowrap}
+.hbars .t{position:relative;height:46px;background:var(--panel);border-radius:6px}
+.hbars .t i{position:absolute;top:0;bottom:0;left:calc(var(--a,0)*1%);width:0;background:var(--line);border-radius:4px;transition:width .9s cubic-bezier(.2,.7,.2,1) calc(var(--d,0)*120ms + .2s)}
+.hbars .hi i{background:var(--accent)}
+.hbars .v{font-size:24px;font-weight:700;font-feature-settings:"tnum";white-space:nowrap}
+.hbars .hi+.v{color:var(--accent)}
+section.on .hbars .t i,.print .hbars .t i{width:calc((var(--b) - var(--a,0))*1%)}
+.axis{grid-column:2;display:flex;justify-content:space-between;font-size:13px;color:var(--muted)}
+table.t{border-collapse:collapse;width:100%;margin-top:28px;font-size:20px}
+table.t th{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:left;padding:0 16px 12px 0;border-bottom:2px solid var(--ink)}
+table.t td{padding:14px 16px 14px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.t tr.hi td{color:var(--accent);font-weight:600}
+.tl{position:relative;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;margin-top:56px;padding-top:34px}
+.tl::before{content:"";position:absolute;left:0;right:0;top:9px;height:2px;background:var(--line)}
+.tl>div{position:relative;padding-right:16px}
+.tl>div::before{content:"";position:absolute;top:-31px;left:0;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--muted)}
+.tl>div.hi::before{background:var(--accent);border-color:var(--accent)}
+.tl b{display:block;font-size:34px;letter-spacing:-.02em;font-feature-settings:"tnum"}
+.tl .hi b{color:var(--accent)}
+.tl span{display:block;font-size:19px;line-height:1.35;color:var(--muted);margin-top:8px}
+.flow{display:flex;align-items:stretch;gap:0;margin-top:44px}
+.flow>div{flex:1;border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:28px 24px;min-height:220px}
+.flow>div.hi{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
+.flow>em{flex:0 0 44px;display:flex;align-items:center;justify-content:center;font-style:normal;font-size:30px;color:var(--muted)}
+.flow b{display:block;font-size:26px;margin-bottom:8px}
+.flow span{display:block;font-size:19px;line-height:1.4;color:var(--muted)}
+.shot{display:block;max-width:100%;max-height:340px;border-radius:12px;border:1px solid var(--line);box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+.cap{font-size:14px;color:var(--muted);margin-top:10px}
+/* Product illustration: a phone showing the real message flow. Caption says whether it is built or a mockup. */
+.phone{width:240px;height:390px;border:10px solid var(--ink);border-radius:40px;background:#ECE5DD;padding:14px 12px;display:flex;flex-direction:column;gap:8px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.5);flex:none}
+.phone .top{margin:-14px -12px 6px;padding:12px 14px;background:#075E54;color:#fff;font-size:15px;font-weight:600}
+.phone .top small{display:block;font-weight:400;opacity:.8;font-size:11px}
+.phone p{font-size:14px;line-height:1.35;max-width:82%;padding:7px 10px;border-radius:8px;background:#fff;color:#111;margin:0;box-shadow:0 1px 1px rgba(0,0,0,.12)}
+.phone p.me{align-self:flex-end;background:#DCF8C6}
+.phone p code{font-family:var(--mono);font-size:12px;display:block;white-space:pre;margin-top:4px}
+.phone.sms{background:#fff}.phone.sms .top{background:#F2F2F7;color:#111}.phone.sms p{background:#E9E9EB}.phone.sms p.me{background:#2F7CF6;color:#fff}
+.rv.phone p{opacity:0;transform:translateY(10px);transition:opacity .4s,transform .4s}
+section.on .rv.phone p,.print .rv.phone p{opacity:1;transform:none}
+section.on .rv.phone p:nth-of-type(2){transition-delay:.5s}section.on .rv.phone p:nth-of-type(3){transition-delay:1s}section.on .rv.phone p:nth-of-type(4){transition-delay:1.5s}
+/* Market size: nested circles, area roughly proportional; every ring carries a sourced number. */
+.rings{position:relative;width:340px;height:340px;flex:none}
+.rings>div{position:absolute;left:50%;bottom:0;transform:translateX(-50%);border-radius:50%;border:2px solid var(--line);background:var(--panel);display:flex;justify-content:center;padding-top:18px;text-align:center}
+.rings>div.hi{background:var(--accent);border-color:var(--accent);color:#fff;align-items:center;padding:0}
+.rings b{display:block;font-size:26px}.rings span{display:block;font-size:14px;color:var(--muted);max-width:180px}.rings .hi span{color:#fff}
+/* Positioning map: two axes that matter to the buyer, logos or names placed on it. */
+.quad{position:relative;width:100%;height:340px;border-left:2px solid var(--ink);border-bottom:2px solid var(--ink);flex:none;background:linear-gradient(var(--line),var(--line)) 50% 0/1px 100% no-repeat,linear-gradient(var(--line),var(--line)) 0 50%/100% 1px no-repeat}
+.quad .ax{position:absolute;white-space:nowrap;font-size:13px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+.quad .ax.x{right:0;bottom:-26px}.quad .ax.y{left:12px;top:0}
+.quad .dot{position:absolute;transform:translateY(50%);display:flex;align-items:center;gap:8px;font-size:16px;white-space:nowrap}
+.quad .dot::before{content:"";width:14px;height:14px;border-radius:50%;background:var(--muted)}
+.quad .dot.hi{color:var(--accent);font-weight:700}.quad .dot.hi::before{background:var(--accent);width:18px;height:18px}
+.split{display:flex;gap:56px;align-items:center;flex:1;min-height:0}.split>div:not(.phone):not(.rings):not(.quad):not(.donut){flex:1;min-width:0}
+/* entrance: children of .rv rise in one after another */
+.rv>*{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+section.on .rv>*,.print .rv>*{opacity:1;transform:none}
+section.on .rv>:nth-child(2){transition-delay:.12s}section.on .rv>:nth-child(3){transition-delay:.24s}
+section.on .rv>:nth-child(4){transition-delay:.36s}section.on .rv>:nth-child(5){transition-delay:.48s}
+section.on .rv>:nth-child(6){transition-delay:.6s}section.on .rv>:nth-child(7){transition-delay:.72s}
+section.on .rv>:nth-child(n+8){transition-delay:.84s}
+@media print{
+  @page{size:1280px 720px;margin:0}
+  html,body{background:none} .stage{position:static;display:block} .deck{transform:none!important;position:static;margin:0;width:auto;height:auto}
+  section{position:relative;opacity:1;width:1280px;height:720px;page-break-after:always;break-after:page}
+  #progress,#notes,#hint{display:none}
+}
+/* Ctrl+P or the P key prints every slide, not only the one on screen: each chart in its final frame. */
+@media print{
+  *,*::before,*::after{transition:none!important}
+  .hbars .t i{width:calc((var(--b) - var(--a,0))*1%)!important}.rv>*,.rv.phone p{opacity:1!important;transform:none!important}
+  .cols i{height:calc(var(--v) / var(--max,100) * (100% - 52px))!important}.donut{--pp:var(--p)!important}
+  .iso svg{opacity:1!important;transform:none!important}.stack>div{clip-path:inset(0)!important}
+}
+@media (prefers-reduced-motion:reduce){section,.hbars .t i,.rv>*,.cols i,.donut,.stack>div,.iso svg{transition:none}}
+/* PDF and PPTX capture the final frame: nothing may still be moving. */
+.print *,.print *::before{transition:none!important}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M8.5 11h7M8.5 14h4"/></symbol>
+  <symbol id="i-store" viewBox="0 0 24 24"><path d="M3 9l1.5-5h15L21 9"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8M10 20v-5h4v5"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16"/><path d="M8 16v-4M12 16V8M16 16v-6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9.5c-.5-1-1.6-1.5-3-1.5-1.7 0-3 .9-3 2s1 1.7 3 2 3 .9 3 2-1.3 2-3 2c-1.4 0-2.5-.5-3-1.5M12 6.5v11"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H6v18h12V7z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="2.5" width="12" height="19" rx="2.5"/><path d="M11 18.5h2"/></symbol>
+  <symbol id="i-rain" viewBox="0 0 24 24"><path d="M7 15a4 4 0 0 1-.6-8A6 6 0 0 1 18 8a3.5 3.5 0 0 1-.5 7z"/><path d="M8 18l-1 2.5M12 18l-1 2.5M16 18l-1 2.5"/></symbol>
+  <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21v-9"/><path d="M12 12c0-4 3-6 7-6 0 4-3 6-7 6zM12 14c0-3-2.5-5-6-5 0 3 2.5 5 6 5z"/></symbol>
+  <symbol id="i-health" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M12 8v8M8 12h8"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3M12 14v3"/></symbol>
+  <symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M15 8l2 2"/></symbol>
+  <symbol id="i-code" viewBox="0 0 24 24"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.5a6.5 6.5 0 0 1 3.5 5.5"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5z"/><path d="M5 9v9M9.5 9v9M14.5 9v9M19 9v9M3 20h18"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7"/><path d="M5 9.5V20h14V9.5M10 20v-5h4v5"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17.5v.5"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16 16l5 5"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></symbol>
+  <symbol id="i-chip" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2-2h13v4"/><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 13.5h2"/></symbol>
+  <symbol id="i-water" viewBox="0 0 24 24"><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M3 6l7 7 4-4 7 7"/><path d="M15 16h6v-6"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><path d="M21 3L3 10.5l7 2.5 2.5 7z"/><path d="M10 13l11-10"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M5 21V4h11l-2 4 2 4H5"/></symbol>
+  <symbol id="i-train" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 10h14M9 20l-2 2M15 20l2 2M8.5 13.5h.01M15.5 13.5h.01"/></symbol>
+  <symbol id="i-pill" viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="8" rx="4" transform="rotate(-45 12 12)"/><path d="M8.6 8.6l6.8 6.8"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+  <symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="5" r="2.6"/><path d="M8 21v-6H6.5v-4.5A2.5 2.5 0 0 1 9 8h6a2.5 2.5 0 0 1 2.5 2.5V15H16v6"/></symbol>
+</svg>
+<div class="stage"><div class="deck" id="deck">
+<!--SLIDES-->
+<section class="center">
+  <div class="fill center">
+    <h1>Name. One line on who it is for and what changes.</h1>
+    <p class="lede">Presenter, role · Event, date</p>
+  </div>
+  <aside class="notes">What you say while this slide is up, written the way you talk.</aside>
+</section>
+<!--/SLIDES-->
+</div></div>
+<div id="progress"></div><div id="notes"></div>
+<div id="hint">← → · F fullscreen · N notes · P print</div>
+<script>
+(()=>{
+  const deck=document.getElementById('deck'),S=[...deck.querySelectorAll('section')],bar=document.getElementById('progress'),nb=document.getElementById('notes');
+  let i=Math.min(S.length-1,Math.max(0,(parseInt(location.hash.slice(1))||1)-1));
+  const fit=()=>{const k=document.body.classList.contains('print')?Math.min(innerWidth/1280,innerHeight/720):Math.min(innerWidth/1280,innerHeight/720)*.96;deck.style.transform=`scale(${k})`};
+  const show=n=>{i=Math.max(0,Math.min(S.length-1,n));S.forEach((s,j)=>s.classList.toggle('on',j===i));
+    bar.style.width=((i+1)/S.length*100)+'%';history.replaceState(null,'','#'+(i+1));
+    const a=S[i].querySelector('aside.notes');nb.textContent=a?a.textContent.trim():'';};
+  // A big number shrinks until it fits its column instead of wrapping or running into the text beside it.
+  const fitBig=()=>deck.querySelectorAll('.big').forEach(b=>{const w=b.parentElement.clientWidth;let f=180;b.style.fontSize='';while(b.scrollWidth>w&&f>60){b.style.fontSize=(f-=6)+'px'}});
+  fitBig();document.fonts&&document.fonts.ready.then(fitBig);
+  // Isotype: data-of icons, the first data-hi in the accent, appearing one after another.
+  deck.querySelectorAll('.iso[data-of]').forEach(el=>{const n=+el.dataset.of,h=+el.dataset.hi||0,step=Math.min(.12,1.4/n);
+    el.innerHTML=Array.from({length:n},(_,k)=>`<svg class="${k<h?'hi':''}" style="transition-delay:${(.2+k*step).toFixed(2)}s"><use href="#i-${el.dataset.icon||'person'}"/></svg>`).join('')});
+  // Brand frame: the deck's mark (<svg id="brandmark">, optional) + title + page number on every slide.
+  const bm=document.getElementById('brandmark'),name=document.title;
+  const mark=()=>{const c=bm.cloneNode(true);c.removeAttribute('id');c.removeAttribute('hidden');return c};
+  S.forEach((s,n)=>{if(s.querySelector('.foot'))return;const f=document.createElement('div');f.className='foot';
+    f.innerHTML=`<span class="bm"></span><span></span><span class="pg">${n+1} / ${S.length}</span>`;
+    if(bm)f.firstChild.appendChild(mark());else f.firstChild.remove();
+    f.querySelector('span:not(.bm):not(.pg)').textContent=name;s.appendChild(f);
+    const lg=s.querySelector('.logo');if(lg&&bm&&!lg.firstElementChild)lg.appendChild(mark());});
+  // ?print shows every slide in its final state, for PDF and PPTX export.
+  if(/[?&]print\b/.test(location.search))document.body.classList.add('print');
+  setTimeout(()=>document.getElementById('hint').classList.add('gone'),4000);
+  // Hovering a bar shows its label and value, so a judge can read exact numbers off the chart.
+  deck.querySelectorAll('.hbars .t').forEach(t=>{const l=t.previousElementSibling,v=t.nextElementSibling;if(l&&v)t.title=l.textContent+': '+v.textContent});
+  addEventListener('resize',fit);fit();show(i);
+  addEventListener('keydown',e=>{
+    if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();show(i+1)}
+    else if(['ArrowLeft','PageUp'].includes(e.key))show(i-1);
+    else if(e.key==='Home')show(0);else if(e.key==='End')show(S.length-1);
+    else if(e.key==='f'||e.key==='F')document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();
+    else if(e.key==='n'||e.key==='N')nb.classList.toggle('show');
+    else if(e.key==='p'||e.key==='P')print();
+  });
+  let x0=null;addEventListener('touchstart',e=>x0=e.touches[0].clientX);
+  addEventListener('touchend',e=>{if(x0==null)return;const d=e.changedTouches[0].clientX-x0;if(Math.abs(d)>40)show(i+(d<0?1:-1));x0=null});
+  deck.addEventListener('click',e=>show(i+(e.clientX>innerWidth/2?1:-1)));
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "media-pipeline-presentation",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Deck harness: HTML stage renderer (Edge via puppeteer-core), icons, fonts, optional pptxgenjs",
+  "type": "commonjs",
+  "dependencies": {
+    "@tabler/icons": "3.49.0",
+    "geist": "1.7.2",
+    "pptxgenjs": "4.0.1",
+    "puppeteer-core": "25.14.0"
+  }
+}

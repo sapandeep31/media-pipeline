@@ -1,0 +1,32 @@
+# secrets
+.env
+*.env
+!.env.example
+
+# environments and downloads (setup.ps1 recreates them)
+node_modules/
+.venv/
+.venv-cb/
+vendor/
+**/vendor/
+video/models/
+__pycache__/
+*.pyc
+
+skills/upstream/
+
+# generated output
+out/
+**/out/
+video/public/gen/
+video/public/assets/clips/
+.frontend-slides/
+
+# your projects (commit one deliberately with: git add -f projects/<name>)
+projects/
+presentation/projects/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.tmp

@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagram stage</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* One 1920x1080 stage per <section class="slide">. Render: ..\make.ps1 html graphics\diagram-stage.html --no-pdf
+     then place out\graphics\png\slide-NN.png in the deck. Tokens live in theme.css. */
+  .flow { grid-row: 3; align-self: center; display: flex; align-items: stretch; gap: 28px; }
+  .step { flex: 1; border: 2px solid var(--line); border-radius: 10px; padding: 28px 26px; background: var(--surface); }
+  .step.ai { border-color: var(--accent); }
+  .step h3 { font: 650 34px/1.15 "Geist"; margin-bottom: 12px; }
+  .step p { font: 400 26px/1.3 "Geist"; color: var(--text-2); }
+  .arrow { align-self: center; font: 400 48px/1 "Geist"; color: var(--text-3); }
+</style>
+</head>
+<body>
+<main class="deck">
+  <section class="slide">
+    <div class="kicker">How it works</div>
+    <h2 class="title">Three steps from input to decision.</h2>
+    <div class="flow">
+      <div class="step"><h3>Collect</h3><p>What the user gives us</p></div>
+      <div class="arrow">→</div>
+      <div class="step ai"><h3>Reason</h3><p>What the model does, named</p></div>
+      <div class="arrow">→</div>
+      <div class="step"><h3>Decide</h3><p>What the user gets back</p></div>
+    </div>
+    <div class="folio"><span>Product</span><span class="n"></span></div>
+  </section>
+</main>
+<script src="deck.js"></script>
+</body>
+</html>

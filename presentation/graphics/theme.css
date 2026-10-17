@@ -1,0 +1,89 @@
+/* HTML stage theme. Every slide is a fixed 1920x1080 stage.
+   Change tokens here, not inside slides. Rules: README.md and skills/deck-studio/. */
+
+@font-face { font-family: "Geist"; src: url("../assets/fonts/Geist-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: block; }
+@font-face { font-family: "Geist Mono"; src: url("../assets/fonts/GeistMono-Variable.woff2") format("woff2"); font-weight: 100 900; font-display: block; }
+
+:root {
+  /* colour: night navy base, one teal accent, one alert colour for "bad" states */
+  --bg: #070d1a;
+  --surface: #0b1220;
+  --surface-2: #111a2c;
+  --line: #1e2a40;
+  --text: #e6ebf2;        /* ~88% white: body text, 15.6:1 on --bg */
+  --text-2: #9aa6b8;      /* secondary text, 7.6:1 on --bg */
+  --text-3: #66738a;      /* source lines only (>= 24px), 4.0:1 */
+  --accent: #10b981;
+  --accent-soft: #6ee7b7;
+  --alert: #f59e0b;       /* incidents, risk; use sparingly */
+
+  /* type scale, ratio ~1.333, on the 1920 stage */
+  --fs-hero: 168px;
+  --fs-h1: 72px;
+  --fs-h2: 56px;
+  --fs-lead: 40px;
+  --fs-body: 32px;
+  --fs-small: 26px;       /* floor; nothing smaller except the folio */
+
+  /* grid: 12 cols, 96px margins, 32px gutters */
+  --m: 96px;
+  --gutter: 32px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { background: #02050b; }
+body { font-family: "Geist", system-ui, sans-serif; color: var(--text); -webkit-font-smoothing: antialiased;
+       -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+/* ---------- stage ---------- */
+.slide {
+  position: relative; width: 1920px; height: 1080px; overflow: hidden;
+  background: var(--bg);
+  padding: var(--m);
+  display: grid; grid-template-columns: repeat(12, 1fr); column-gap: var(--gutter);
+  grid-template-rows: auto auto 1fr auto; align-content: start;
+}
+.slide > * { grid-column: 1 / -1; }
+/* absolutely-positioned children must not take the grid area as containing block */
+.slide > .folio, .slide > .art, .slide > .fill, .slide > .scrim { grid-column: auto; grid-row: auto; }
+
+/* fixed title position on every slide: kicker row, then the action title */
+.kicker { font: 500 var(--fs-small)/1 "Geist"; color: var(--accent-soft); letter-spacing: 0.01em; margin-bottom: 28px; }
+.title  { font: 650 var(--fs-h1)/1.08 "Geist"; letter-spacing: -0.02em; max-width: 26ch; text-wrap: balance; }
+.lead   { font: 400 var(--fs-lead)/1.3 "Geist"; color: var(--text-2); max-width: 40ch; margin-top: 32px; }
+.body   { font: 400 var(--fs-body)/1.4 "Geist"; }
+.source { font: 400 var(--fs-small)/1.3 "Geist"; color: var(--text-3); align-self: end; }
+.mono   { font-family: "Geist Mono", monospace; }
+
+/* footer: deck name + folio, same place on every slide */
+.folio { position: absolute; left: var(--m); right: var(--m); bottom: 44px; display: flex; justify-content: space-between;
+         font: 500 22px/1 "Geist"; color: var(--text-3); }
+
+/* ---------- components ---------- */
+.big { font: 700 var(--fs-hero)/0.95 "Geist"; letter-spacing: -0.04em; font-variant-numeric: tabular-nums; }
+.big .to { color: var(--accent); }
+.big .from { color: var(--text-2); }
+.tag { display: inline-block; font: 500 var(--fs-small)/1 "Geist"; padding: 10px 18px; border: 2px solid var(--line); border-radius: 6px; color: var(--text-2); }
+.tag.sim { border-color: var(--alert); color: var(--alert); }   /* every simulated number carries this */
+
+.shot { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; border: 2px solid var(--line); display: block; }
+.icon { width: 48px; height: 48px; color: var(--accent); stroke-width: 1.75; }
+
+/* full-bleed variant: image fills the slide, text sits on a scrim */
+.slide.bleed { padding: 0; }
+.slide.bleed .fill { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.slide.bleed .scrim { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(7,13,26,.94) 0%, rgba(7,13,26,.7) 45%, rgba(7,13,26,0) 75%); }
+.slide.bleed .over { position: relative; padding: var(--m); grid-column: 1 / 8; }
+
+/* ---------- viewing modes ---------- */
+@page { size: 1920px 1080px; margin: 0; }
+@media print { .slide { break-after: page; } .deck-ui { display: none; } }
+@media screen {
+  body:not(.print) .deck { display: flex; flex-direction: column; align-items: center; gap: 40px; padding: 40px 0; }
+  body:not(.print) .slide { zoom: var(--zoom, 0.5); box-shadow: 0 0 0 1px #1e2a40; }
+  body.present .slide { display: none; }
+  body.present .slide.on { display: grid; position: fixed; top: 50%; left: 50%; zoom: 1;
+                           transform: translate(-50%, -50%) scale(var(--fit, 1)); }
+  body.present .deck { padding: 0; }
+}
+body.print .deck { display: block; }

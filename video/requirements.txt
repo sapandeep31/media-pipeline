@@ -1,0 +1,11 @@
+# video/.venv  (python 3.12). TTS (Kokoro), word timing (faster-whisper), SFX/music synthesis, QA tiles.
+kokoro-onnx==0.6.1
+faster-whisper==1.2.1
+onnxruntime==1.31.0
+numpy==2.5.4
+scipy==1.18.1
+soundfile==0.14.0
+PyYAML==6.0.3
+pillow==12.3.0
+# optional: background removal for cutouts (pulls large models on first use)
+# rembg==2.0.67

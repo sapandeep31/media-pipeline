@@ -1,0 +1,9 @@
+# presentation/.venv  (python 3.12): edit PPTX, dump text, rasterise PDFs, validate, cut fonts.
+python-pptx==1.0.2
+markitdown[pptx]
+Pillow
+lxml
+defusedxml
+pypdf
+pymupdf
+fonttools

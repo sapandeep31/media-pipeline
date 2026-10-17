@@ -1,0 +1,6 @@
+# video/.venv-cb  (python 3.12, NVIDIA GPU recommended). Chatterbox zero-shot voice cloning used by tools/tts/cb_worker.py.
+# Install torch first from the CUDA index:
+#   .venv-cb\Scripts\pip install torch==2.6.0 torchaudio==2.6.0 --index-url https://download.pytorch.org/whl/cu124
+chatterbox-tts==0.1.7
+numpy==1.26.4
+soundfile==0.14.0
